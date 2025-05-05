@@ -80,6 +80,43 @@ services:
     depends_on:
       - tempo
     restart: unless-stopped
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-data:/data
+    ports:
+      - "8999:9000"
+    networks:
+      - backend
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "3069:8080"
+    volumes:
+      - open-webui:/app/backend/data
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      OLLAMA_BASE_URL: http://0.0.0.0:11434/api
+    restart: always
+    depends_on:
+      - ollama
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - backend
 networks:
   backend:
     driver: bridge
@@ -90,3 +127,6 @@ volumes:
   jaeger-data:
   tempo-data:
   grafana-data:
+  portainer-data:
+  open-webui:
+  ollama_data:
