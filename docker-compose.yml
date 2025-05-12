@@ -107,8 +107,10 @@ services:
     restart: always
     depends_on:
       - ollama
+    networks:
+      - ai
   ollama:
-    image: ollama/ollama:latest
+    image: ollama/ollama:rocm
     container_name: ollama
     ports:
       - "11434:11434"
@@ -116,8 +118,20 @@ services:
       - ollama_data:/root/.ollama
     restart: unless-stopped
     networks:
-      - backend
+      - ai
+  ollama-local:
+    image: ollama/ollama
+    container_name: ollama-local
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+    networks:
+      - ai
 networks:
+  ai:
+    driver: bridge
   backend:
     driver: bridge
   postgres:
