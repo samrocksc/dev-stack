@@ -1,0 +1,30 @@
+FROM jupyter/datascience-notebook:latest
+ENV JUPYTER_PASSWORD="assword"
+
+RUN whoami
+
+USER root
+
+# Install necessary dependencies for Deno (if any are missing in the base image)
+# For example, you might need curl or unzip
+RUN apt-get update && apt-get install -y --no-install-recommends \
+  curl \
+  unzip \
+  && rm -rf /var/lib/apt/lists/*
+
+# Download and install Deno
+RUN curl -fsSL https://deno.land/install.sh | sh
+# ENV DENO_INSTALL="/root/.deno"
+ENV DENO_INSTALL="/home/jovyan/.deno"
+ENV PATH="$DENO_INSTALL/bin:$PATH"
+
+USER jovyan
+RUN deno jupyter --install
+
+RUN chown -R jovyan:users /home/jovyan/.local
+
+WORKDIR /home/jovyan/work
+
+RUN chown -R jovyan:users /home/jovyan/work
+
+CMD ["jupyter", "notebook", "--notebook-dir=/home/jovyan/work", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root", "--NotebookApp.token=''", "--NotebookApp.password=''"]

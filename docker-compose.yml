@@ -129,6 +129,20 @@ services:
     restart: unless-stopped
     networks:
       - ai
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile.deno-jupyter
+    ports:
+      - "8888:8888"
+    volumes:
+      - /media/sam/main/notebooks:/home/jovyan/work
+    environment:
+      GRANT_SUDO: yes
+      JUPYTER_ENABLE_LAB: "yes"
+      JUPYTER_PASSWORD: "assword"
+    working_dir: /home/jovyan/work
+    user: jovyan
 networks:
   ai:
     driver: bridge
