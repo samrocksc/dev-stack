@@ -143,6 +143,15 @@ services:
       JUPYTER_PASSWORD: "assword"
     working_dir: /home/jovyan/work
     user: jovyan
+  ubuntu-ssh:
+    build:
+      context: .
+      dockerfile: Dockerfile.ubuntu-dev
+    ports:
+      - "2222:22"
+    restart: unless-stopped
+    networks:
+      - backend
 networks:
   ai:
     driver: bridge
