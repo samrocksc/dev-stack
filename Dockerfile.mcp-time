@@ -1,0 +1,31 @@
+FROM alpine:3.19
+
+# Install required packages
+RUN apk add --no-cache \
+    tzdata \
+    python3 \
+    py3-pip \
+    py3-flask \
+    py3-prometheus-client \
+    curl
+
+# Set timezone environment variable
+ENV TZ=UTC
+
+# Create app directory
+WORKDIR /app
+
+# Copy time service script
+COPY scripts/time_service.py .
+
+# No need to install Python dependencies with pip as we use Alpine packages
+
+# Expose port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Run the time service
+CMD ["python3", "time_service.py"]
